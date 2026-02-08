@@ -77,10 +77,6 @@
                         <img class="preview-image" id="singleOverlayPreview" alt="Overlay preview">
                         <input type="file" id="singleOverlayInput" accept="image/*" hidden>
                     </div>
-                    <div class="scale-slider-container" id="scaleSliderContainer">
-                        <label for="overlayScale">Scale: <span id="scaleValue">100</span>%</label>
-                        <input type="range" id="overlayScale" min="10" max="200" value="100">
-                    </div>
 
                     <div class="drop-zone hidden" id="overlaysDropZone">
                         <div class="drop-zone-content">
@@ -101,25 +97,7 @@
             </section>
 
             <section class="options-section">
-                <div class="option-group">
-                    <label>Split Direction</label>
-                    <div class="toggle-buttons">
-                        <button class="toggle-btn active" data-direction="horizontal">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="3" y1="12" x2="21" y2="12" />
-                                <polyline points="15,6 21,12 15,18" />
-                            </svg>
-                            Horizontal
-                        </button>
-                        <button class="toggle-btn" data-direction="vertical">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="12" y1="3" x2="12" y2="21" />
-                                <polyline points="6,15 12,21 18,15" />
-                            </svg>
-                            Vertical
-                        </button>
-                    </div>
-                </div>
+
 
                 <button class="generate-btn" id="generateBtn" disabled>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -131,7 +109,33 @@
 
             <section class="preview-section" id="previewSection">
                 <h2>Generated Theme Images</h2>
-                <div class="preview-grid" id="previewGrid"></div>
+                <div class="image-editor-wrapper">
+                    <div class="preview-grid" id="previewGrid"></div>
+                    <div class="controls-container" id="overlayControls">
+                        <div class="control-group">
+                            <label for="overlayScale">Scale: <span id="scaleValue">100</span>%</label>
+                            <input type="range" id="overlayScale" min="10" max="200" value="100">
+                        </div>
+                        <div class="control-group">
+                            <label for="overlayPosX">X Pos: <span id="posXValue">0</span>px</label>
+                            <input type="range" id="overlayPosX" min="-500" max="500" value="0">
+                        </div>
+                        <div class="control-group">
+                            <label for="overlayPosY">Y Pos: <span id="posYValue">0</span>px</label>
+                            <input type="range" id="overlayPosY" min="-500" max="500" value="0">
+                        </div>
+                        <div class="control-group">
+                            <label for="overlayRotation">Rotation: <span id="rotationValue">0</span>°</label>
+                            <input type="range" id="overlayRotation" min="0" max="360" value="0">
+                        </div>
+                        <button id="resetPosBtn" class="reset-btn" title="Reset Position & Scale">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                <path d="M3 3v5h5" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
                 <div class="filename-input">
                     <label for="exportFilename">Export Name:</label>
                     <input type="text" id="exportFilename" value="TelephonyUI-8" placeholder="Enter filename">

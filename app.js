@@ -20,7 +20,6 @@ let backgroundImage = null;
 let overlays = new Map();
 let singleOverlayImage = null;
 let overlayMode = 'single'; // 'single' or 'multiple'
-let splitDirection = 'horizontal';
 let generatedImages = [];
 
 // ===== DOM Elements =====
@@ -41,9 +40,16 @@ const previewGrid = document.getElementById('previewGrid');
 const downloadBtn = document.getElementById('downloadBtn');
 const downloadPassthmBtn = document.getElementById('downloadPassthmBtn');
 const transparentBgBtn = document.getElementById('transparentBgBtn');
-const scaleSliderContainer = document.getElementById('scaleSliderContainer');
+const overlayControls = document.getElementById('overlayControls');
 const overlayScaleSlider = document.getElementById('overlayScale');
 const scaleValueDisplay = document.getElementById('scaleValue');
+const overlayPosXSlider = document.getElementById('overlayPosX');
+const posXValueDisplay = document.getElementById('posXValue');
+const overlayPosYSlider = document.getElementById('overlayPosY');
+const posYValueDisplay = document.getElementById('posYValue');
+const overlayRotationSlider = document.getElementById('overlayRotation');
+const rotationValueDisplay = document.getElementById('rotationValue');
+const resetPosBtn = document.getElementById('resetPosBtn');
 
 // ===== Initialize =====
 function init() {
@@ -52,8 +58,7 @@ function init() {
     setupDropZone(overlaysDropZone, overlaysInput, handleOverlaysUpload);
     setupTransparentBgButton();
     setupOverlayModeToggle();
-    setupScaleSlider();
-    setupDirectionToggle();
+    setupPositionControls();
     setupGenerateButton();
     setupDownloadButton();
     setupDownloadPassthmButton();
@@ -137,10 +142,49 @@ function useTransparentBackground() {
     img.src = canvas.toDataURL('image/png');
 }
 
-// ===== Scale Slider =====
-function setupScaleSlider() {
+// ===== Positioning Controls =====
+function setupPositionControls() {
+    // Helper to update preview
+    const update = () => {
+        // Only generate if we have minimum requirements (logic handled inside generateTheme)
+        generateTheme();
+    };
+
+    // Scale
     overlayScaleSlider.addEventListener('input', () => {
         scaleValueDisplay.textContent = overlayScaleSlider.value;
+        update();
+    });
+
+    // X Position
+    overlayPosXSlider.addEventListener('input', () => {
+        posXValueDisplay.textContent = overlayPosXSlider.value;
+        update();
+    });
+
+    // Y Position
+    overlayPosYSlider.addEventListener('input', () => {
+        posYValueDisplay.textContent = overlayPosYSlider.value;
+        update();
+    });
+
+    // Rotation
+    overlayRotationSlider.addEventListener('input', () => {
+        rotationValueDisplay.textContent = overlayRotationSlider.value;
+        update();
+    });
+
+    // Reset Button
+    resetPosBtn.addEventListener('click', () => {
+        overlayScaleSlider.value = 100;
+        scaleValueDisplay.textContent = '100';
+        overlayPosXSlider.value = 0;
+        posXValueDisplay.textContent = '0';
+        overlayPosYSlider.value = 0;
+        posYValueDisplay.textContent = '0';
+        overlayRotationSlider.value = 0;
+        rotationValueDisplay.textContent = '0';
+        update();
     });
 }
 
@@ -215,7 +259,7 @@ function handleSingleOverlayUpload(files) {
             singleOverlayImage = img;
             singleOverlayPreview.src = e.target.result;
             singleOverlayDropZone.classList.add('has-image');
-            scaleSliderContainer.classList.add('visible');
+            overlayControls.classList.add('visible');
             updateGenerateButton();
         };
         img.src = e.target.result;
@@ -236,10 +280,12 @@ function setupOverlayModeToggle() {
                 singleOverlayDropZone.classList.remove('hidden');
                 overlaysDropZone.classList.add('hidden');
                 overlayChecklist.classList.add('hidden');
+                overlayControls.classList.remove('hidden');
             } else {
                 singleOverlayDropZone.classList.add('hidden');
                 overlaysDropZone.classList.remove('hidden');
                 overlayChecklist.classList.remove('hidden');
+                overlayControls.classList.add('hidden');
             }
 
             updateGenerateButton();
@@ -256,16 +302,7 @@ function renderOverlayChecklist() {
     }).join('');
 }
 
-// ===== Direction Toggle =====
-function setupDirectionToggle() {
-    toggleButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            toggleButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            splitDirection = btn.dataset.direction;
-        });
-    });
-}
+
 
 // ===== Generate Button =====
 function updateGenerateButton() {
@@ -293,16 +330,13 @@ function generateTheme() {
     previewGrid.innerHTML = '';
 
     // Split the photo into 10 slices
-    const photoSlices = splitPhoto(backgroundImage, splitDirection);
+    const photoSlices = splitPhoto(backgroundImage);
 
     // Get overlay slices based on mode
     let overlaySlices;
     if (overlayMode === 'single' && singleOverlayImage) {
-        // Auto-detect overlay orientation based on aspect ratio
-        const overlayDirection = singleOverlayImage.width >= singleOverlayImage.height ? 'horizontal' : 'vertical';
-
         // Cut 10 sections of exactly 300x287 from the overlay (no resizing)
-        overlaySlices = splitOverlayFixed(singleOverlayImage, overlayDirection);
+        overlaySlices = splitOverlayFixed(singleOverlayImage);
     } else if (overlayMode === 'multiple' && overlays.size === 10) {
         // Use the individual overlay images
         overlaySlices = OVERLAY_FILENAMES.map(filename => overlays.get(filename));
@@ -351,55 +385,31 @@ function generateTheme() {
     previewSection.classList.add('visible');
 }
 
-function splitPhoto(image, direction) {
+function splitPhoto(image) {
     const slices = [];
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
 
-    if (direction === 'horizontal') {
-        // Split horizontally (left to right)
-        const sliceWidth = image.width / 10;
-        canvas.width = sliceWidth;
-        canvas.height = image.height;
+    // Split horizontally (left to right)
+    const sliceWidth = image.width / 10;
+    canvas.width = sliceWidth;
+    canvas.height = image.height;
 
-        for (let i = 0; i < 10; i++) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(
-                image,
-                i * sliceWidth, 0, sliceWidth, image.height,
-                0, 0, sliceWidth, image.height
-            );
+    for (let i = 0; i < 10; i++) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(
+            image,
+            i * sliceWidth, 0, sliceWidth, image.height,
+            0, 0, sliceWidth, image.height
+        );
 
-            // Create a new canvas for this slice
-            const sliceCanvas = document.createElement('canvas');
-            sliceCanvas.width = sliceWidth;
-            sliceCanvas.height = image.height;
-            const sliceCtx = sliceCanvas.getContext('2d');
-            sliceCtx.drawImage(canvas, 0, 0);
-            slices.push(sliceCanvas);
-        }
-    } else {
-        // Split vertically (top to bottom)
-        const sliceHeight = image.height / 10;
-        canvas.width = image.width;
-        canvas.height = sliceHeight;
-
-        for (let i = 0; i < 10; i++) {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(
-                image,
-                0, i * sliceHeight, image.width, sliceHeight,
-                0, 0, image.width, sliceHeight
-            );
-
-            // Create a new canvas for this slice
-            const sliceCanvas = document.createElement('canvas');
-            sliceCanvas.width = image.width;
-            sliceCanvas.height = sliceHeight;
-            const sliceCtx = sliceCanvas.getContext('2d');
-            sliceCtx.drawImage(canvas, 0, 0);
-            slices.push(sliceCanvas);
-        }
+        // Create a new canvas for this slice
+        const sliceCanvas = document.createElement('canvas');
+        sliceCanvas.width = sliceWidth;
+        sliceCanvas.height = image.height;
+        const sliceCtx = sliceCanvas.getContext('2d');
+        sliceCtx.drawImage(canvas, 0, 0);
+        slices.push(sliceCanvas);
     }
 
     return slices;
@@ -410,22 +420,40 @@ function splitPhoto(image, direction) {
 //          4 5 6
 //          7 8 9
 //            0
-function splitOverlayFixed(image, direction) {
+function splitOverlayFixed(image) {
     const slices = [];
 
     // Get scale from slider (default 100%)
     const scale = parseInt(overlayScaleSlider.value) / 100;
 
-    // Scale the image first (round to prevent sub-pixel issues)
+    // Get rotation
+    const rotation = parseInt(overlayRotationSlider.value);
+
+    // Get X/Y offsets from sliders
+    const posX = parseInt(overlayPosXSlider.value);
+    const posY = parseInt(overlayPosYSlider.value);
+
+    // Scale the image first
     const scaledWidth = Math.round(image.width * scale);
     const scaledHeight = Math.round(image.height * scale);
 
-    // Create scaled version of the image
+    // Calculate Bounding Box of Rotated Image
+    const rad = rotation * Math.PI / 180;
+    const absCos = Math.abs(Math.cos(rad));
+    const absSin = Math.abs(Math.sin(rad));
+    const rotatedWidth = Math.round((scaledWidth * absCos) + (scaledHeight * absSin));
+    const rotatedHeight = Math.round((scaledWidth * absSin) + (scaledHeight * absCos));
+
+    // Create canvas for rotated image
     const scaledCanvas = document.createElement('canvas');
-    scaledCanvas.width = scaledWidth;
-    scaledCanvas.height = scaledHeight;
+    scaledCanvas.width = rotatedWidth;
+    scaledCanvas.height = rotatedHeight;
     const scaledCtx = scaledCanvas.getContext('2d');
-    scaledCtx.drawImage(image, 0, 0, scaledWidth, scaledHeight);
+
+    // Draw rotated image centered in canvas
+    scaledCtx.translate(rotatedWidth / 2, rotatedHeight / 2);
+    scaledCtx.rotate(rad);
+    scaledCtx.drawImage(image, -scaledWidth / 2, -scaledHeight / 2, scaledWidth, scaledHeight);
 
     // Grid layout: 3 columns, 4 rows (last row has only center cell for 0)
     const gridCols = 3;
@@ -433,10 +461,10 @@ function splitOverlayFixed(image, direction) {
     const totalWidth = OUTPUT_WIDTH * gridCols;   // 900px
     const totalHeight = OUTPUT_HEIGHT * gridRows; // 1148px
 
-    // Calculate offset to center the grid on the scaled image
-    // Round to prevent sub-pixel rendering artifacts (transparent lines)
-    const offsetX = Math.round((scaledWidth - totalWidth) / 2);
-    const offsetY = Math.round((scaledHeight - totalHeight) / 2);
+    // Calculate offset to center the grid on the rotated image
+    // Subtract user offsets to move the crop region
+    const offsetX = Math.round((rotatedWidth - totalWidth) / 2) - posX;
+    const offsetY = Math.round((rotatedHeight - totalHeight) / 2) - posY;
 
     // Define grid positions for each key (0-9)
     // Key index -> [column, row]
