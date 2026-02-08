@@ -545,6 +545,9 @@ async function downloadAll(filename) {
         zip.file(img.filename, base64Data, { base64: true });
     }
 
+    // Add credit file
+    zip.file("spy_g.txt", "Made with PassThemer\nhttps://github.com/SpyGdev/PassThemer");
+
     // Generate and download zip
     const blob = await zip.generateAsync({ type: 'blob' });
     const url = URL.createObjectURL(blob);
