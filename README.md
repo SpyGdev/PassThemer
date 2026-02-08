@@ -59,6 +59,10 @@ PassThemer/
 - CSS3 with glassmorphism effects
 - JSZip for archive creation
 
+## Bug Reporting 🐛
+
+Found a bug or have a suggestion? Please [open an issue](https://github.com/SpyGdev/PassThemer/issues) on GitHub.
+
 ## License
 
 MIT License
