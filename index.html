@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passcode Theme Generator</title>
+    <meta name="description"
+        content="Generate custom iPhone passcode theme images by splitting your photo into 10 sections">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app">
+        <header class="header">
+            <h1>Passcode Theme Generator</h1>
+            <p>Simple Passcode themer</p>
+        </header>
+
+        <main class="main">
+            <section class="upload-section">
+                <div class="upload-card">
+                    <h2>Background Photo</h2>
+                    <div class="drop-zone" id="photoDropZone">
+                        <div class="drop-zone-content">
+                            <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" />
+                                <circle cx="8.5" cy="8.5" r="1.5" />
+                                <path d="M21 15l-5-5L5 21" />
+                            </svg>
+                            <p>Drag & drop your photo here</p>
+                            <span>or click to browse</span>
+                        </div>
+                        <img class="preview-image" id="photoPreview" alt="Photo preview">
+                        <input type="file" id="photoInput" accept="image/*" hidden>
+                    </div>
+                    <button class="transparent-btn" id="transparentBgBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="7" fill="currentColor" opacity="0.3" />
+                            <rect x="10" y="3" width="7" height="7" />
+                            <rect x="3" y="10" width="7" height="7" />
+                            <rect x="10" y="10" width="7" height="7" fill="currentColor" opacity="0.3" />
+                        </svg>
+                        Use Transparent Background
+                    </button>
+                </div>
+
+                <div class="upload-card">
+                    <h2>Overlay</h2>
+                    <div class="overlay-mode-toggle">
+                        <button class="mode-btn active" data-mode="single">Single Image</button>
+                        <button class="mode-btn" data-mode="multiple">10 Separate</button>
+                    </div>
+
+                    <div class="drop-zone" id="singleOverlayDropZone">
+                        <div class="drop-zone-content">
+                            <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" />
+                                <line x1="3" y1="9" x2="21" y2="9" />
+                                <line x1="9" y1="21" x2="9" y2="9" />
+                            </svg>
+                            <p>Drop single overlay image</p>
+                            <span>Will be split into 10 sections</span>
+                        </div>
+                        <img class="preview-image" id="singleOverlayPreview" alt="Overlay preview">
+                        <input type="file" id="singleOverlayInput" accept="image/*" hidden>
+                    </div>
+                    <div class="scale-slider-container" id="scaleSliderContainer">
+                        <label for="overlayScale">Scale: <span id="scaleValue">100</span>%</label>
+                        <input type="range" id="overlayScale" min="10" max="200" value="100">
+                    </div>
+
+                    <div class="drop-zone hidden" id="overlaysDropZone">
+                        <div class="drop-zone-content">
+                            <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                                <polyline points="14,2 14,8 20,8" />
+                                <line x1="12" y1="18" x2="12" y2="12" />
+                                <line x1="9" y1="15" x2="15" y2="15" />
+                            </svg>
+                            <p>Drag & drop overlay PNGs</p>
+                            <span>or click to browse (select all 10)</span>
+                        </div>
+                        <input type="file" id="overlaysInput" accept="image/png" multiple hidden>
+                    </div>
+                    <ul class="overlay-checklist hidden" id="overlayChecklist"></ul>
+                </div>
+            </section>
+
+            <section class="options-section">
+                <div class="option-group">
+                    <label>Split Direction</label>
+                    <div class="toggle-buttons">
+                        <button class="toggle-btn active" data-direction="horizontal">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="3" y1="12" x2="21" y2="12" />
+                                <polyline points="15,6 21,12 15,18" />
+                            </svg>
+                            Horizontal
+                        </button>
+                        <button class="toggle-btn" data-direction="vertical">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="3" x2="12" y2="21" />
+                                <polyline points="6,15 12,21 18,15" />
+                            </svg>
+                            Vertical
+                        </button>
+                    </div>
+                </div>
+
+                <button class="generate-btn" id="generateBtn" disabled>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5,3 19,12 5,21" />
+                    </svg>
+                    Generate Theme
+                </button>
+            </section>
+
+            <section class="preview-section" id="previewSection">
+                <h2>Generated Theme Images</h2>
+                <div class="preview-grid" id="previewGrid"></div>
+                <div class="filename-input">
+                    <label for="exportFilename">Export Name:</label>
+                    <input type="text" id="exportFilename" value="TelephonyUI-8" placeholder="Enter filename">
+                </div>
+                <div class="download-buttons">
+                    <button class="download-btn" id="downloadBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7,10 12,15 17,10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        Download ZIP
+                    </button>
+                    <button class="download-btn passthm" id="downloadPassthmBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                            <polyline points="7,10 12,15 17,10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        Download .passthm
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>Made with love by Spy_G</p>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
