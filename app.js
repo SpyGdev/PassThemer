@@ -44,7 +44,6 @@ const transparentBgBtn = document.getElementById('transparentBgBtn');
 const scaleSliderContainer = document.getElementById('scaleSliderContainer');
 const overlayScaleSlider = document.getElementById('overlayScale');
 const scaleValueDisplay = document.getElementById('scaleValue');
-const countValueDisplay = document.getElementById('countValue');
 
 // ===== Initialize =====
 function init() {
@@ -59,9 +58,6 @@ function init() {
     setupDownloadButton();
     setupDownloadPassthmButton();
     renderOverlayChecklist();
-
-    // Fetch initial download count
-    updateDownloadCount();
 }
 
 // ===== Drop Zone Setup =====
@@ -563,37 +559,6 @@ async function downloadAll(filename) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-
-    // Increment download count
-    updateDownloadCount(true);
-}
-
-// ===== Download Count =====
-async function updateDownloadCount(increment = false) {
-    if (!scaleValueDisplay) return; // Safety check
-
-    // Initial loading state only if not Incrementing
-    if (!increment && countValueDisplay.textContent === '...') {
-        countValueDisplay.textContent = '...';
-    }
-
-    try {
-        const method = increment ? 'POST' : 'GET';
-        const response = await fetch('/api/counter', { method });
-
-        if (response.ok) {
-            const data = await response.json();
-            countValueDisplay.textContent = new Intl.NumberFormat().format(data.count);
-        } else {
-            console.warn('API error:', response.status);
-            // Don't change text if error, keep old value or ...
-        }
-    } catch (error) {
-        console.warn('Could not fetch download count (likely local dev)');
-        if (countValueDisplay.textContent === '...') {
-            countValueDisplay.textContent = 'N/A';
-        }
-    }
 }
 
 function setupDownloadPassthmButton() {

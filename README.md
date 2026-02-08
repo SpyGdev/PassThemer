@@ -58,10 +58,11 @@ This project uses **Vercel KV (Redis)** to track downloads. To make it work on y
 
 1. Deploy the project to Vercel.
 2. In your Vercel Project Dashboard, go to **Storage**.
-3. Click **Create Database** and select **Vercel KV**.
-4. Follow the steps to create a new KV database (free tier is sufficient).
-5. Once created, go to the project **Settings** > **Environment Variables**.
-6. Ensure the `KV_URL`, `KV_REST_API_URL`, and `KV_REST_API_TOKEN` variables are automatically linked (or add them manually from your KV database details).
+3. Click **Create Database** → Select **Vercel KV**.
+4. **Note:** If you don't see "Vercel KV" listed, go to the **Integration Marketplace** and search for "Upstash" or "Vercel KV".
+5. Follow the steps to create a new KV database (free tier is sufficient).
+6. Once created, go to your project **Settings** > **Environment Variables**.
+7. Ensure the `KV_URL`, `KV_REST_API_URL`, and `KV_REST_API_TOKEN` variables are automatically linked (or add them manually from your KV database details).
 7. Redeploy your project for changes to take effect.
 
 ## Technologies Used
