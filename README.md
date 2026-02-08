@@ -52,6 +52,18 @@ PassThemer/
 └── README.md       # This file
 ```
 
+## Download Counter Setup (Vercel) 📊
+
+This project uses **Vercel KV (Redis)** to track downloads. To make it work on your Vercel deployment:
+
+1. Deploy the project to Vercel.
+2. In your Vercel Project Dashboard, go to **Storage**.
+3. Click **Create Database** and select **Vercel KV**.
+4. Follow the steps to create a new KV database (free tier is sufficient).
+5. Once created, go to the project **Settings** > **Environment Variables**.
+6. Ensure the `KV_URL`, `KV_REST_API_URL`, and `KV_REST_API_TOKEN` variables are automatically linked (or add them manually from your KV database details).
+7. Redeploy your project for changes to take effect.
+
 ## Technologies Used
 
 - HTML5 Canvas API for image processing
