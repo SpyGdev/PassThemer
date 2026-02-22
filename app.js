@@ -190,17 +190,17 @@ function setupPositionControls() {
 
 // ===== Overlays Upload =====
 function handleOverlaysUpload(files) {
-    const pngFiles = files.filter(f => f.type === 'image/png');
+    const imageFiles = files.filter(f => f.type.startsWith('image/'));
 
-    if (pngFiles.length === 0) {
-        alert('Please upload PNG files');
+    if (imageFiles.length === 0) {
+        alert('Please upload image files');
         return;
     }
 
     let matchedCount = 0;
     let unmatchedFiles = [];
 
-    pngFiles.forEach(file => {
+    imageFiles.forEach(file => {
         const filename = file.name;
 
         // First, try exact match
@@ -210,10 +210,15 @@ function handleOverlaysUpload(files) {
             return;
         }
 
-        // Try to match by digit (0-9) in filename
-        const digitMatch = filename.match(/(\d)/);
+        // Try to match by number in filename
+        const digitMatch = filename.match(/(\d+)/);
         if (digitMatch) {
-            const digit = parseInt(digitMatch[1]);
+            let digit = parseInt(digitMatch[1]);
+            // Often users name their 0th image as 10.png
+            if (digit === 10) {
+                digit = 0;
+            }
+
             if (digit >= 0 && digit <= 9) {
                 const targetFilename = OVERLAY_FILENAMES[digit];
                 loadOverlay(file, targetFilename);
@@ -226,7 +231,7 @@ function handleOverlaysUpload(files) {
     });
 
     if (unmatchedFiles.length > 0 && matchedCount === 0) {
-        alert(`Could not match overlay files. Expected filenames like:\n${OVERLAY_FILENAMES.slice(0, 3).join('\n')}\n...\n\nOr files containing digits 0-9 in the name.`);
+        alert(`Could not match overlay files. Expected filenames containing numbers 0-9 (or 1-10) in the name.`);
     }
 }
 
@@ -316,6 +321,26 @@ function updateGenerateButton() {
     }
 
     generateBtn.disabled = !(hasPhoto && hasOverlay);
+
+    const warningEl = document.getElementById('generateWarning');
+    if (warningEl) {
+        if (generateBtn.disabled) {
+            let missing = [];
+            if (!hasPhoto) missing.push("Background Photo");
+            if (!hasOverlay) missing.push(overlayMode === 'single' ? "Overlay Image" : "All 10 Overlay Images");
+
+            // Only show the warning if they have uploaded AT LEAST one thing, 
+            // so it doesn't yell at them immediately on page load.
+            if (hasPhoto || overlays.size > 0 || singleOverlayImage !== null) {
+                warningEl.textContent = `Missing: ${missing.join(' and ')}`;
+                warningEl.classList.remove('hidden');
+            } else {
+                warningEl.classList.add('hidden');
+            }
+        } else {
+            warningEl.classList.add('hidden');
+        }
+    }
 }
 
 function setupGenerateButton() {

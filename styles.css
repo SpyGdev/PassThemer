@@ -475,6 +475,17 @@ body {
     color: white;
 }
 
+/* ===== Generate Warning ===== */
+.generate-warning {
+    color: var(--error);
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
 /* ===== Generate Button ===== */
 .generate-btn {
     display: flex;

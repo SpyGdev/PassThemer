@@ -87,10 +87,10 @@
                                 <line x1="12" y1="18" x2="12" y2="12" />
                                 <line x1="9" y1="15" x2="15" y2="15" />
                             </svg>
-                            <p>Drag & drop overlay PNGs</p>
+                            <p>Drag & drop overlay images</p>
                             <span>or click to browse (select all 10)</span>
                         </div>
-                        <input type="file" id="overlaysInput" accept="image/png" multiple hidden>
+                        <input type="file" id="overlaysInput" accept="image/*" multiple hidden>
                     </div>
                     <ul class="overlay-checklist hidden" id="overlayChecklist"></ul>
                 </div>
@@ -98,7 +98,7 @@
 
             <section class="options-section">
 
-
+                <div id="generateWarning" class="generate-warning hidden"></div>
                 <button class="generate-btn" id="generateBtn" disabled>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polygon points="5,3 19,12 5,21" />
