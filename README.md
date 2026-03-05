@@ -2,7 +2,7 @@
 
 A simple web-based tool for creating custom iPhone passcode themes. Upload your images and generate theme files ready for iOS theming.
 
-[**Live Demo**](https://pass-themer.vercel.app/)
+[**Live Demo**](https://spyg.lol/passtheme.html)
 
 ## Features
 
